@@ -4,13 +4,13 @@ const { program } = require('commander');
 async function publish({server, subject, message}) {
     try {
         const nc = await connect({ servers: server });
-        console.log(`Conectado a ${server}`);
+        console.log(`Connected to ${server}`);
 
         nc.publish(subject, message);
-        console.log(`Mensaje publicado en '${subject}': ${message}`);
+        console.log(`Message published to '${subject}': ${message}`);
 
         await nc.close();
-        console.log('Conexión cerrada');
+        console.log('Connection closed');
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);
