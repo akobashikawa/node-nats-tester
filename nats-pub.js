@@ -10,7 +10,7 @@ async function publish({server, subject, message}) {
         const encoder = new TextEncoder();
         const data = encoder.encode(message);
         nc.publish(subject, data);
-        console.log(`Message published to ${subject}: ${message}`);
+        console.log(`[${subject}] Message: ${message}`);
 
         // await nc.close();
         await nc.drain();  // Mejor práctica: drenar antes de cerrar
