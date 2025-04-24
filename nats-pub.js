@@ -1,6 +1,6 @@
 const { connect } = require('nats');
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
+const { program } = require('commander');
+
 async function publish({server, subject, message}) {
     try {
         const nc = await connect({ servers: server });
@@ -19,28 +19,25 @@ async function publish({server, subject, message}) {
 
 // Execute if running directly
 if (require.main === module) {
-    const argv = yargs(hideBin(process.argv))
-    .option('s', {
-        alias: 'server',
-        describe: 'NATS server URL',
-        type: 'string',
-        default: 'nats://localhost:4222'
-    })
-    .option('t', {
-        alias: 'subject',
-        describe: 'Subject to publish to',
-        type: 'string',
-        demandOption: true
-    })
-    .demandCommand(1, 'You need to provide a message to publish')
-    .usage('Usage: $0 -s [server] -t [subject] <message>')
-    .example('$0 -s nats://localhost:4222 -sub test.subject "Hello World"')
-    .argv;
+    program
+        .name('nats-pub')
+        .description('Publish messages to NATS server')
+        .option('-s, --server <url>', 'NATS server URL', 'nats://localhost:4222')
+        .requiredOption('-t, --topic <subject>', 'Subject to publish to')
+        .argument('<message>', 'Message to publish')
+        .addHelpText('after', `
+Examples:
+  $ nats-pub -s nats://localhost:4222 -t test.subject "Hello World"
+  $ nats-pub -t test.subject "Simple message"`)
+        .parse();
 
+    const options = program.opts();
+    
     publish({
-        server: argv.server,
-        subject: argv.subject,
-        message: argv._.join(' ')});
+        server: options.server,
+        subject: options.topic,
+        message: program.args[0]
+    });
 }
 
 module.exports = publish;
