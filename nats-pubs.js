@@ -1,7 +1,7 @@
 const { connect } = require('nats');
 const { program } = require('commander');
 
-async function publish({server, subject, message}) {
+async function publish({ server, subjects, message }) {
     try {
         const nc = await connect({ servers: server });
         console.log(`Connected to ${server}`);
@@ -9,9 +9,17 @@ async function publish({server, subject, message}) {
         // Codificar el mensaje como Uint8Array (requerido por NATS v2)
         const encoder = new TextEncoder();
         const data = encoder.encode(message);
-        
-        nc.publish(subject, data);
-        console.log(`[${subject}] Message: ${message}`);
+
+        // Dividir los subjects por comas y publicar en cada uno
+        const subjectList = subjects.split(",").map(subject => subject.trim());
+        if (subjectList.length === 0) {
+            console.error('No subjects provided for publishing.');
+            process.exit(1);
+        }
+        for (const subject of subjectList) {
+            nc.publish(subject, data); // Elimina espacios en blanco
+            console.log(`[${subject}] Message: ${message}`);
+        }
 
         // await nc.close();
         await nc.drain();  // Mejor práctica: drenar antes de cerrar
@@ -25,22 +33,22 @@ async function publish({server, subject, message}) {
 // Execute if running directly
 if (require.main === module) {
     program
-        .name('nats-pub')
-        .description('Publish messages to NATS server')
+        .name('nats-pubs')
+        .description('Publish messages to many topics on NATS server')
         .option('-s, --server <url>', 'NATS server URL', 'nats://localhost:4222')
-        .requiredOption('-t, --topic <subject>', 'Subject to publish to')
+        .requiredOption('-t, --topics <subjects>', 'Subjects to publish to')
         .argument('<message>', 'Message to publish')
         .addHelpText('after', `
 Examples:
-  $ nats-pub -s nats://localhost:4222 -t test.subject "Hello World"
-  $ nats-pub -t test.subject "Simple message"`)
+  $ nats-pubs -s nats://localhost:4222 -t "test.topic1,test.topic2" "Hello World"
+  $ nats-pubs -t "test.topic1,test.topic2" "Simple message"`)
         .parse();
 
     const options = program.opts();
-    
+
     publish({
         server: options.server,
-        subject: options.topic,
+        subjects: options.topics,
         message: program.args[0]
     });
 }
