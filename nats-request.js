@@ -10,8 +10,8 @@ async function request({server, subject, message}) {
         const encoder = new TextEncoder();
         const data = encoder.encode(message);
         const response = await nc.request(subject, data);
-        console.log(`Request to ${subject}: ${message}`);
-        console.log(`Response from ${subject}:`, response.string());
+        console.log(`[${subject}] Request: ${message}`);
+        console.log(`[${subject}] Response:`, response.string());
 
         // await nc.close();
         await nc.drain();  // Mejor práctica: drenar antes de cerrar
