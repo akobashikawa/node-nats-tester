@@ -17,7 +17,8 @@ async function subscribe({server, subject}) {
         }
 
         // Note: This code will only execute if subscription is closed
-        await nc.close();
+        // await nc.close();
+        await nc.drain();  // Mejor práctica: drenar antes de cerrar
         console.log('Connection closed');
     } catch (error) {
         console.error('Error:', error.message);
