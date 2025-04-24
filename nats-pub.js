@@ -6,10 +6,14 @@ async function publish({server, subject, message}) {
         const nc = await connect({ servers: server });
         console.log(`Connected to ${server}`);
 
-        nc.publish(subject, message);
-        console.log(`Message published to '${subject}': ${message}`);
+        // Codificar el mensaje como Uint8Array (requerido por NATS v2)
+        const encoder = new TextEncoder();
+        const data = encoder.encode(message);
+        nc.publish(subject, data);
+        console.log(`Message published to ${subject}: ${message}`);
 
-        await nc.close();
+        // await nc.close();
+        await nc.drain();  // Mejor práctica: drenar antes de cerrar
         console.log('Connection closed');
     } catch (error) {
         console.error('Error:', error.message);
