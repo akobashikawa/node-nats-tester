@@ -1,7 +1,7 @@
 const { connect } = require('nats');
 const { program } = require('commander');
 
-async function echo({server, subject}) {
+async function hello({server, subject}) {
     try {
         const nc = await connect({ servers: server });
         console.log(`Connected to ${server}`);
@@ -18,8 +18,9 @@ async function echo({server, subject}) {
                 console.log(`[${subject}] Request received: ${requestData}`);
                 
                 // Reply with the same message
-                msg.respond(requestData);
-                console.log(`[${subject}] Response sent: ${requestData}`);
+                const response = `Hello, ${requestData}`;
+                msg.respond(response);
+                console.log(`[${subject}] Response sent: ${response}`);
             }
         });
 
@@ -31,7 +32,7 @@ async function echo({server, subject}) {
             process.exit(0);
         });
 
-        console.log('Reply Echo ready (Press Ctrl+C to exit)');
+        console.log('Reply Hello ready (Press Ctrl+C to exit)');
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);
@@ -41,22 +42,22 @@ async function echo({server, subject}) {
 // Execute if running directly
 if (require.main === module) {
     program
-        .name('nats-reply-echo')
-        .description('Reply Echo for NATS request-reply pattern')
+        .name('nats-reply-hello')
+        .description('Reply Hello for NATS request-reply pattern')
         .option('-s, --server <url>', 'NATS server URL', 'nats://localhost:4222')
         .requiredOption('-t, --topic <subject>', 'Subject to listen for requests')
         .addHelpText('after', `
 Examples:
-  $ nats-reply-echo -s nats://localhost:4222 -t echo.service
-  $ nats-reply-echo -t echo.service`)
+  $ nats-reply-hello -s nats://localhost:4222 -t hello.service
+  $ nats-reply-hello -t hello.service`)
         .parse();
 
     const options = program.opts();
     
-    echo({
+    hello({
         server: options.server,
         subject: options.topic
     });
 }
 
-module.exports = echo;
+module.exports = hello;
