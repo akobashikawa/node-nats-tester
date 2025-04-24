@@ -31,7 +31,7 @@ async function echo({server, subject}) {
             process.exit(0);
         });
 
-        console.log('Echo service ready (Press Ctrl+C to exit)');
+        console.log('Reply Echo ready (Press Ctrl+C to exit)');
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);
@@ -41,14 +41,14 @@ async function echo({server, subject}) {
 // Execute if running directly
 if (require.main === module) {
     program
-        .name('nats-echo')
-        .description('Echo service for NATS request-reply pattern')
+        .name('nats-reply-echo')
+        .description('Reply Echo for NATS request-reply pattern')
         .option('-s, --server <url>', 'NATS server URL', 'nats://localhost:4222')
         .requiredOption('-t, --topic <subject>', 'Subject to listen for requests')
         .addHelpText('after', `
 Examples:
-  $ nats-echo -s nats://localhost:4222 -t echo.service
-  $ nats-echo -t echo.service`)
+  $ nats-reply-echo -s nats://localhost:4222 -t echo.service
+  $ nats-reply-echo -t echo.service`)
         .parse();
 
     const options = program.opts();
