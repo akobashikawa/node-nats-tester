@@ -16,10 +16,21 @@ async function createStream({ server, name, subjects, retention = 'workqueue', s
             subjects: subjectsArray,
             retention, // workqueue, interest, or limits
             storage,   // file or memory
-            max_msgs_per_subject: 1000000,
-            max_bytes: 1024 * 1024 * 1024, // 1GB
-            discard: 'old',
-            max_age: 24 * 60 * 60 * 1000000000, // 24 hours in nanoseconds
+            // max_msgs: 1000000,                    // máximo 1 millón de mensajes
+            // max_msgs_per_subject: 100000,         // máximo 100k mensajes por subject
+            // max_bytes: 1024 * 1024 * 1024,        // máximo 1GB total
+            // max_age: 24 * 60 * 60 * 1000000000,   // retener por 24 horas (en nanosegundos)
+            // max_msg_size: 1024 * 1024,            // máximo 1MB por mensaje
+            // discard: "old",                       // descartar mensajes antiguos al llegar al límite
+            // discard: "nuevos",                    // descartar mensajes nuevos al llegar al límite
+            // duplicate_window: 120000000000,       // ventana de 2 minutos (en nanoseconds) para detectar duplicados
+            max_msgs: 20,                            // máximo 20 mensajes
+            max_msgs_per_subject: 10,                // máximo 10 mensajes por subject
+            max_bytes: 1024 * 1024 * 1024,           // máximo 1GB total
+            max_age: 10 * 60 * 1000000000,           // retener por 10 minutos (en nanosegundos)
+            max_msg_size: 1024 * 1024,               // máximo 1MB por mensaje
+            discard: "old",                          // descartar mensajes antiguos al llegar al límite
+            duplicate_window: 2 * 60 * 1000000000,   // ventana de 2 minutos (en nanoseconds) para detectar duplicados
         };
 
         await jsm.streams.add(streamConfig);
