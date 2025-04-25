@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "commander": "^13.1.0",
+    "inquirer": "^8.2.6",
     "nats": "^2.29.3",
     "yargs": "github:yargs/yargs"
   }
