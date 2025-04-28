@@ -13,12 +13,17 @@ async function subscribe({server, subject}) {
         // Process incoming messages
         for await (const msg of subscription) {
             const data = msg.string(); // Decode message data as string
-            console.log(`[${subject}] Received: ${data}`);
+            try {
+                // Intentar parsear como JSON por si viene en formato estructurado
+                const jsonData = JSON.parse(data);
+                console.log(`[${msg.subject}] Received:`, JSON.stringify(jsonData, null, 2));
+            } catch {
+                // Si no es JSON, mostrar como string plano
+                console.log(`[${msg.subject}] Received: ${data}`);
+            }
         }
 
-        // Note: This code will only execute if subscription is closed
-        // await nc.close();
-        await nc.drain();  // Mejor práctica: drenar antes de cerrar
+        await nc.drain();
         console.log('Connection closed');
     } catch (error) {
         console.error('Error:', error.message);
